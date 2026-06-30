@@ -39,7 +39,8 @@ $secretKey = $config['secretKey'] ?? '';
 
 $orderInfo = 'Thanh toán đơn hàng qua MoMo QR';
 $amount = $_REQUEST['amount'] ?? '10000';
-$orderId = $_REQUEST['order_id'] ?? (string)time();
+$realOrderId = $_REQUEST['order_id'] ?? (string)time();
+$orderId = $realOrderId . '_' . time();
 $redirectUrl = 'http://178.128.217.229/api/payments/callback.php';
 $ipnUrl = 'http://178.128.217.229/api/payments/callback.php';
 $extraData = '';

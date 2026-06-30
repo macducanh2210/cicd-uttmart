@@ -41,13 +41,14 @@ $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $e
 $partnerSignature = hash_hmac('sha256', $rawHash, $secretKey);
 
 if ($signature == $partnerSignature) {
+    $realOrderId = explode('_', $orderId)[0];
     if ($resultCode == '1006') {
         // Giao dịch thành công
         error_log("MoMo payment successful for orderId: $orderId");
         try {
             $pdo = getPDO();
             $stmt = $pdo->prepare('UPDATE hoadonthanhtoan SET PAYMENT_STATUS = "paid" WHERE ID = :order_id');
-            $stmt->execute(['order_id' => $orderId]);
+            $stmt->execute(['order_id' => $realOrderId]);
         } catch (Throwable $e) {
             error_log("Lỗi cập nhật DB: " . $e->getMessage());
         }
@@ -57,7 +58,7 @@ if ($signature == $partnerSignature) {
         try {
             $pdo = getPDO();
             $stmt = $pdo->prepare('UPDATE hoadonthanhtoan SET PAYMENT_STATUS = "failed" WHERE ID = :order_id');
-            $stmt->execute(['order_id' => $orderId]);
+            $stmt->execute(['order_id' => $realOrderId]);
         } catch (Throwable $e) {
             error_log("Lỗi cập nhật DB: " . $e->getMessage());
         }
