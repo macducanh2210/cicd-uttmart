@@ -20,7 +20,18 @@ class GeminiChatWidget {
         this.init();
     }
 
-    init() {
+    async init() {
+        try {
+            const res = await fetch('/api/customers/config.php');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.gemini_api_key) {
+                    this.apiKey = data.gemini_api_key;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load Gemini API key', e);
+        }
         this.createWidget();
         this.bindEvents();
         this.loadChatHistory();

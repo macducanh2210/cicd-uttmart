@@ -40,8 +40,8 @@ $secretKey = $config['secretKey'] ?? '';
 $orderInfo = 'Thanh toán đơn hàng qua MoMo ATM';
 $amount = $_REQUEST['amount'] ?? '10000';
 $orderId = $_REQUEST['order_id'] ?? (string)time();
-$redirectUrl = 'http://localhost:8080/api/payments/callback.php';
-$ipnUrl = 'http://localhost:8080/api/payments/callback.php';
+$redirectUrl = 'http://178.128.217.229/api/payments/callback.php';
+$ipnUrl = 'http://178.128.217.229/api/payments/callback.php';
 $extraData = '';
 
 $requestId = (string)time();
