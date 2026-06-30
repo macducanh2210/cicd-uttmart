@@ -1,0 +1,25 @@
+# ===== Environment & Secrets =====
+.env
+.env.*
+!.env.example
+
+# ===== IDE & Editor =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OS generated =====
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.bak
+
+# ===== Docker runtime data =====
+docker-compose.override.yml
+
+# ===== Gemini Agent =====
+.agents/

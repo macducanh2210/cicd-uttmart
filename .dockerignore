@@ -1,0 +1,10 @@
+.git
+.github
+.gitignore
+.env
+.env.*
+README.md
+*.md
+.vscode
+.idea
+.agents
