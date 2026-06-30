@@ -70,23 +70,50 @@ jobs:
         run: docker compose down -v
 
   # ── Giai đoạn 2: Deploy (chỉ khi push vào main) ──
-  # ℹ️ Job này sẽ được bật lại khi có VPS. Cần thêm secrets: VPS_HOST, VPS_USER, VPS_SSH_KEY
-  # cd:
-  #   name: Deploy to Server
-  #   needs: ci
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-  #   steps:
-  #     - name: Deploy via SSH
-  #       uses: appleboy/ssh-action@v1
-  #       with:
-  #         host: ${{ secrets.VPS_HOST }}
-  #         username: ${{ secrets.VPS_USER }}
-  #         key: ${{ secrets.VPS_SSH_KEY }}
-  #         script: |
-  #           cd /opt/uttmart
-  #           git pull origin main
-  #           docker compose down
-  #           docker compose up -d --build
-  #           docker image prune -f
-  #           echo "✅ Deploy completed successfully!"
+  cd:
+    name: Deploy to Server
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Clone repo if it doesn't exist, otherwise pull
+            if [ ! -d "/opt/uttmart" ]; then
+              git clone https://github.com/macducanh2210/cicd-uttmart.git /opt/uttmart
+            fi
+            
+            cd /opt/uttmart
+            git pull origin main
+            
+            # Create .env file on server
+            cat <<EOF > .env
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}
+            PRODUCT_DB_PASSWORD=${{ secrets.PRODUCT_DB_PASSWORD }}
+            ORDER_DB_PASSWORD=${{ secrets.ORDER_DB_PASSWORD }}
+            INVENTORY_DB_PASSWORD=${{ secrets.INVENTORY_DB_PASSWORD }}
+            EMPLOYEE_DB_PASSWORD=${{ secrets.EMPLOYEE_DB_PASSWORD }}
+            ATTENDANCE_DB_PASSWORD=${{ secrets.ATTENDANCE_DB_PASSWORD }}
+            EXPENSE_DB_PASSWORD=${{ secrets.EXPENSE_DB_PASSWORD }}
+            CUSTOMER_DB_PASSWORD=${{ secrets.CUSTOMER_DB_PASSWORD }}
+            PAYMENT_DB_PASSWORD=${{ secrets.PAYMENT_DB_PASSWORD }}
+            INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USER=${{ secrets.SMTP_USER }}
+            SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+            MAIL_FROM=${{ secrets.MAIL_FROM }}
+            MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            EOF
+            
+            docker compose down
+            docker compose up -d --build
+            docker image prune -f
+            echo "✅ Deploy completed successfully!"
