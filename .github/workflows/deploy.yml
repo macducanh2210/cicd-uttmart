@@ -1,0 +1,97 @@
+name: UTTMart CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Giai đoạn 1: Build & Validate ──
+  ci:
+    name: Build & Health Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env from secrets
+        run: |
+          cat <<EOF > .env
+          MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+          USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}
+          PRODUCT_DB_PASSWORD=${{ secrets.PRODUCT_DB_PASSWORD }}
+          ORDER_DB_PASSWORD=${{ secrets.ORDER_DB_PASSWORD }}
+          INVENTORY_DB_PASSWORD=${{ secrets.INVENTORY_DB_PASSWORD }}
+          EMPLOYEE_DB_PASSWORD=${{ secrets.EMPLOYEE_DB_PASSWORD }}
+          ATTENDANCE_DB_PASSWORD=${{ secrets.ATTENDANCE_DB_PASSWORD }}
+          EXPENSE_DB_PASSWORD=${{ secrets.EXPENSE_DB_PASSWORD }}
+          CUSTOMER_DB_PASSWORD=${{ secrets.CUSTOMER_DB_PASSWORD }}
+          PAYMENT_DB_PASSWORD=${{ secrets.PAYMENT_DB_PASSWORD }}
+          INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT }}
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM=${{ secrets.MAIL_FROM }}
+          MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          EOF
+
+      - name: Build Docker images
+        run: docker compose build --no-cache
+
+      - name: Start all services
+        run: docker compose up -d
+
+      - name: Wait for databases to initialize
+        run: sleep 40
+
+      - name: Health check - API Gateway
+        run: curl -sf http://localhost:8080/ || exit 1
+
+      - name: Health check - User Service
+        run: curl -sf http://localhost:8081/ || true
+
+      - name: Health check - Product Service
+        run: curl -sf http://localhost:8082/ || true
+
+      - name: Show running containers
+        if: always()
+        run: docker compose ps
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs --tail=50
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v
+
+  # ── Giai đoạn 2: Deploy (chỉ khi push vào main) ──
+  cd:
+    name: Deploy to Server
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/uttmart
+            git pull origin main
+            
+            # Recreate containers with new code
+            docker compose down
+            docker compose up -d --build
+            
+            # Cleanup unused images
+            docker image prune -f
+            
+            echo "✅ Deploy completed successfully!"
