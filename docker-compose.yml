@@ -1,52 +1,25 @@
 services:
-  user-db:
+  db:
     image: mysql:8.0
-    container_name: user-db
+    container_name: db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: user_db
-      MYSQL_USER: user_service
-      MYSQL_PASSWORD: ${USER_DB_PASSWORD}
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+      PRODUCT_DB_PASSWORD: ${PRODUCT_DB_PASSWORD}
+      ORDER_DB_PASSWORD: ${ORDER_DB_PASSWORD}
+      INVENTORY_DB_PASSWORD: ${INVENTORY_DB_PASSWORD}
+      EMPLOYEE_DB_PASSWORD: ${EMPLOYEE_DB_PASSWORD}
+      ATTENDANCE_DB_PASSWORD: ${ATTENDANCE_DB_PASSWORD}
+      EXPENSE_DB_PASSWORD: ${EXPENSE_DB_PASSWORD}
+      CUSTOMER_DB_PASSWORD: ${CUSTOMER_DB_PASSWORD}
+      PAYMENT_DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./databases/user_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    networks:
-      - fashion-net
-
-  product-db:
-    image: mysql:8.0
-    container_name: product-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: product_db
-      MYSQL_USER: product_service
-      MYSQL_PASSWORD: ${PRODUCT_DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./databases/product_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    networks:
-      - fashion-net
-
-  order-db:
-    image: mysql:8.0
-    container_name: order-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: order_db
-      MYSQL_USER: order_service
-      MYSQL_PASSWORD: ${ORDER_DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./databases/order_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./infra/mysql/init-dbs.sh:/docker-entrypoint-initdb.d/init-dbs.sh:ro
+      - ./databases:/docker-entrypoint-initdb.d/sql:ro
     networks:
       - fashion-net
 
@@ -61,13 +34,13 @@ services:
     volumes:
       - ./services/user-service:/var/www/html
     environment:
-      DB_HOST: user-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: user_db
       DB_USER: user_service
       DB_PASSWORD: ${USER_DB_PASSWORD}
     depends_on:
-      - user-db
+      - db
     networks:
       - fashion-net
 
@@ -82,14 +55,14 @@ services:
     volumes:
       - ./services/product-service:/var/www/html
     environment:
-      DB_HOST: product-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: product_db
       DB_USER: product_service
       DB_PASSWORD: ${PRODUCT_DB_PASSWORD}
       INTERNAL_API_KEY: ${INTERNAL_API_KEY}
     depends_on:
-      - product-db
+      - db
     networks:
       - fashion-net
 
@@ -104,14 +77,14 @@ services:
     volumes:
       - ./services/order-service:/var/www/html
     environment:
-      DB_HOST: order-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: order_db
       DB_USER: order_service
       DB_PASSWORD: ${ORDER_DB_PASSWORD}
       INTERNAL_API_KEY: ${INTERNAL_API_KEY}
     depends_on:
-      - order-db
+      - db
     networks:
       - fashion-net
 
@@ -126,30 +99,13 @@ services:
     volumes:
       - ./services/payment-service:/var/www/html
     environment:
-      DB_HOST: order-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: order_db
       DB_USER: order_service
       DB_PASSWORD: ${ORDER_DB_PASSWORD}
     depends_on:
-      - order-db
-    networks:
-      - fashion-net
-
-  inventory-db:
-    image: mysql:8.0
-    container_name: inventory-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: inventory_db
-      MYSQL_USER: inventory_service
-      MYSQL_PASSWORD: ${INVENTORY_DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./databases/inventory_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - db
     networks:
       - fashion-net
 
@@ -164,31 +120,14 @@ services:
     volumes:
       - ./services/inventory-service:/var/www/html
     environment:
-      DB_HOST: inventory-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: inventory_db
       DB_USER: inventory_service
       DB_PASSWORD: ${INVENTORY_DB_PASSWORD}
       INTERNAL_API_KEY: ${INTERNAL_API_KEY}
     depends_on:
-      - inventory-db
-    networks:
-      - fashion-net
-
-  employee-db:
-    image: mysql:8.0
-    container_name: employee-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: employee_db
-      MYSQL_USER: employee_service
-      MYSQL_PASSWORD: ${EMPLOYEE_DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./databases/employee_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - db
     networks:
       - fashion-net
 
@@ -203,31 +142,14 @@ services:
     volumes:
       - ./services/employee-service:/var/www/html
     environment:
-      DB_HOST: employee-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: employee_db
       DB_USER: employee_service
       DB_PASSWORD: ${EMPLOYEE_DB_PASSWORD}
       INTERNAL_API_KEY: ${INTERNAL_API_KEY}
     depends_on:
-      - employee-db
-    networks:
-      - fashion-net
-
-  attendance-db:
-    image: mysql:8.0
-    container_name: attendance-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: attendance_db
-      MYSQL_USER: attendance_service
-      MYSQL_PASSWORD: ${ATTENDANCE_DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./databases/attendance_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - db
     networks:
       - fashion-net
 
@@ -242,32 +164,15 @@ services:
     volumes:
       - ./services/attendance-service:/var/www/html
     environment:
-      DB_HOST: attendance-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: attendance_db
       DB_USER: attendance_service
       DB_PASSWORD: ${ATTENDANCE_DB_PASSWORD}
       USER_EMPLOYEE_API: http://user-service/api/users/employees/get-all.php
     depends_on:
-      - attendance-db
+      - db
       - user-service
-    networks:
-      - fashion-net
-
-  expense-db:
-    image: mysql:8.0
-    container_name: expense-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: expense_db
-      MYSQL_USER: expense_service
-      MYSQL_PASSWORD: ${EXPENSE_DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./databases/expense_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - fashion-net
 
@@ -282,31 +187,14 @@ services:
     volumes:
       - ./services/expense-service:/var/www/html
     environment:
-      DB_HOST: expense-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: expense_db
       DB_USER: expense_service
       DB_PASSWORD: ${EXPENSE_DB_PASSWORD}
       INTERNAL_API_KEY: ${INTERNAL_API_KEY}
     depends_on:
-      - expense-db
-    networks:
-      - fashion-net
-
-  customer-db:
-    image: mysql:8.0
-    container_name: customer-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: customer_db
-      MYSQL_USER: customer_service
-      MYSQL_PASSWORD: ${CUSTOMER_DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./databases/customer_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - db
     networks:
       - fashion-net
 
@@ -321,7 +209,7 @@ services:
     volumes:
       - ./services/customer-service:/var/www/html
     environment:
-      DB_HOST: customer-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_NAME: customer_db
       DB_USER: customer_service
@@ -334,24 +222,7 @@ services:
       SMTP_USER: ${SMTP_USER}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
     depends_on:
-      - customer-db
-    networks:
-      - fashion-net
-
-  payment-db:
-    image: mysql:8.0
-    container_name: payment-db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: payment_db
-      MYSQL_USER: payment_service
-      MYSQL_PASSWORD: ${PAYMENT_DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./databases/payment_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - db
     networks:
       - fashion-net
 
