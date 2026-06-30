@@ -92,27 +92,25 @@ jobs:
             cd /opt/uttmart
             git pull origin main
             
-            # Create .env file on server
-            cat <<EOF > .env
-            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-            USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}
-            PRODUCT_DB_PASSWORD=${{ secrets.PRODUCT_DB_PASSWORD }}
-            ORDER_DB_PASSWORD=${{ secrets.ORDER_DB_PASSWORD }}
-            INVENTORY_DB_PASSWORD=${{ secrets.INVENTORY_DB_PASSWORD }}
-            EMPLOYEE_DB_PASSWORD=${{ secrets.EMPLOYEE_DB_PASSWORD }}
-            ATTENDANCE_DB_PASSWORD=${{ secrets.ATTENDANCE_DB_PASSWORD }}
-            EXPENSE_DB_PASSWORD=${{ secrets.EXPENSE_DB_PASSWORD }}
-            CUSTOMER_DB_PASSWORD=${{ secrets.CUSTOMER_DB_PASSWORD }}
-            PAYMENT_DB_PASSWORD=${{ secrets.PAYMENT_DB_PASSWORD }}
-            INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}
-            SMTP_HOST=${{ secrets.SMTP_HOST }}
-            SMTP_PORT=${{ secrets.SMTP_PORT }}
-            SMTP_USER=${{ secrets.SMTP_USER }}
-            SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
-            MAIL_FROM=${{ secrets.MAIL_FROM }}
-            MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
-            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-            EOF
+            # Create .env file on server safely
+            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" > .env
+            echo "USER_DB_PASSWORD=${{ secrets.USER_DB_PASSWORD }}" >> .env
+            echo "PRODUCT_DB_PASSWORD=${{ secrets.PRODUCT_DB_PASSWORD }}" >> .env
+            echo "ORDER_DB_PASSWORD=${{ secrets.ORDER_DB_PASSWORD }}" >> .env
+            echo "INVENTORY_DB_PASSWORD=${{ secrets.INVENTORY_DB_PASSWORD }}" >> .env
+            echo "EMPLOYEE_DB_PASSWORD=${{ secrets.EMPLOYEE_DB_PASSWORD }}" >> .env
+            echo "ATTENDANCE_DB_PASSWORD=${{ secrets.ATTENDANCE_DB_PASSWORD }}" >> .env
+            echo "EXPENSE_DB_PASSWORD=${{ secrets.EXPENSE_DB_PASSWORD }}" >> .env
+            echo "CUSTOMER_DB_PASSWORD=${{ secrets.CUSTOMER_DB_PASSWORD }}" >> .env
+            echo "PAYMENT_DB_PASSWORD=${{ secrets.PAYMENT_DB_PASSWORD }}" >> .env
+            echo "INTERNAL_API_KEY=${{ secrets.INTERNAL_API_KEY }}" >> .env
+            echo "SMTP_HOST=${{ secrets.SMTP_HOST }}" >> .env
+            echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
+            echo "SMTP_USER=${{ secrets.SMTP_USER }}" >> .env
+            echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> .env
+            echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> .env
+            echo "MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}" >> .env
+            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
             
             docker compose down
             docker compose up -d --build
