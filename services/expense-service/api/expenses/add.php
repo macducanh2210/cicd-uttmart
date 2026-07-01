@@ -36,7 +36,7 @@ if (!in_array($type, $allowedTypes, true)) {
     $type = 'other';
 }
 
-$allowedCategories = ['electric', 'water', 'internet', 'salary', 'import', 'office', 'maintenance', 'other'];
+$allowedCategories = ['utilities', 'electric', 'water', 'internet', 'salary', 'import', 'office', 'maintenance', 'other'];
 if (!in_array($category, $allowedCategories, true)) {
     $category = 'other';
 }
