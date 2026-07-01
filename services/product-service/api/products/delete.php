@@ -24,7 +24,8 @@ $input = getJsonInput();
 ensureProductCrudWriteAuthorized($input);
 
 $productId = isset($input['product_id']) ? (int) $input['product_id'] : 0;
-$mode = trim((string) ($input['mode'] ?? 'soft'));
+// Default delete mode: 'hard' to remove rows permanently when not specified
+$mode = trim((string) ($input['mode'] ?? 'hard'));
 
 if ($productId <= 0) {
     jsonResponse(400, [
@@ -35,7 +36,8 @@ if ($productId <= 0) {
 }
 
 if ($mode !== 'soft' && $mode !== 'hard') {
-    $mode = 'soft';
+    // fallback to hard delete for safety per request
+    $mode = 'hard';
 }
 
 try {
