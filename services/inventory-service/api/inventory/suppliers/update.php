@@ -31,10 +31,10 @@ $params = ['id' => $supplierId];
 
 if (array_key_exists('supplier_name', $input) || array_key_exists('name', $input)) {
     $supplierName = trim((string) ($input['supplier_name'] ?? $input['name'] ?? ''));
-    if ($supplierName === '') {
+    if ($supplierName === '' || mb_strlen($supplierName) < 2 || mb_strlen($supplierName) > 100) {
         jsonResponse(400, [
             'success' => false,
-            'message' => 'supplier_name cannot be empty.',
+            'message' => 'Tên nhà cung cấp là bắt buộc và phải từ 2 đến 100 ký tự.',
             'data' => null,
         ]);
     }
@@ -43,27 +43,55 @@ if (array_key_exists('supplier_name', $input) || array_key_exists('name', $input
 }
 
 if (array_key_exists('contact_name', $input)) {
-    $fields[] = 'contact_name = :contact_name';
     $contact = trim((string) $input['contact_name']);
-    $params['contact_name'] = $contact !== '' ? $contact : null;
+    if ($contact === '' || mb_strlen($contact) < 2 || mb_strlen($contact) > 100) {
+        jsonResponse(400, [
+            'success' => false,
+            'message' => 'Tên người liên hệ là bắt buộc và phải từ 2 đến 100 ký tự.',
+            'data' => null,
+        ]);
+    }
+    $fields[] = 'contact_name = :contact_name';
+    $params['contact_name'] = $contact;
 }
 
 if (array_key_exists('phone', $input)) {
-    $fields[] = 'phone = :phone';
     $phone = trim((string) $input['phone']);
-    $params['phone'] = $phone !== '' ? $phone : null;
+    if ($phone === '' || !preg_match('/^0(3\d|5\d|7\d|8\d|9\d)\d{7}$/', $phone)) {
+        jsonResponse(400, [
+            'success' => false,
+            'message' => 'Số điện thoại không hợp lệ. Ví dụ: 0901234567.',
+            'data' => null,
+        ]);
+    }
+    $fields[] = 'phone = :phone';
+    $params['phone'] = $phone;
 }
 
 if (array_key_exists('email', $input)) {
-    $fields[] = 'email = :email';
     $email = trim((string) $input['email']);
-    $params['email'] = $email !== '' ? $email : null;
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        jsonResponse(400, [
+            'success' => false,
+            'message' => 'Email không hợp lệ hoặc bị bỏ trống.',
+            'data' => null,
+        ]);
+    }
+    $fields[] = 'email = :email';
+    $params['email'] = $email;
 }
 
 if (array_key_exists('address', $input)) {
-    $fields[] = 'address = :address';
     $address = trim((string) $input['address']);
-    $params['address'] = $address !== '' ? $address : null;
+    if ($address === '' || mb_strlen($address) < 5 || mb_strlen($address) > 255) {
+        jsonResponse(400, [
+            'success' => false,
+            'message' => 'Địa chỉ là bắt buộc và phải từ 5 đến 255 ký tự.',
+            'data' => null,
+        ]);
+    }
+    $fields[] = 'address = :address';
+    $params['address'] = $address;
 }
 
 if (array_key_exists('is_active', $input)) {
