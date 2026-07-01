@@ -143,8 +143,8 @@
                     <div class="form-group mb-3">
                         <label>Mật khẩu hiện tại</label>
                         <div class="input-group">
-                            <input type="password" id="currentPassword" class="form-control" placeholder="Nhập mật khẩu hiện tại">
-                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword', this)"><i class="fa fa-eye"></i></button>
+                            <input type="password" id="currentPassword" class="form-control" placeholder="Nhập mật khẩu hiện tại" oninput="handlePasswordInput('currentPassword', 'btnToggleCurrentPassword')">
+                            <button id="btnToggleCurrentPassword" class="btn btn-outline-secondary" type="button" style="display: none;" onclick="togglePassword('currentPassword', this)"><i class="fa fa-eye"></i></button>
                         </div>
                         <div id="currentPasswordError" class="error-message text-danger mt-1"></div>
                     </div>
@@ -152,8 +152,8 @@
                     <div class="form-group mb-3">
                         <label>Mật khẩu mới</label>
                         <div class="input-group">
-                            <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)">
-                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('newPassword', this)"><i class="fa fa-eye"></i></button>
+                            <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)" oninput="handlePasswordInput('newPassword', 'btnToggleNewPassword')">
+                            <button id="btnToggleNewPassword" class="btn btn-outline-secondary" type="button" style="display: none;" onclick="togglePassword('newPassword', this)"><i class="fa fa-eye"></i></button>
                         </div>
                         <div id="newPasswordError" class="error-message text-danger mt-1"></div>
                     </div>
@@ -161,8 +161,8 @@
                     <div class="form-group mb-3">
                         <label>Xác nhận mật khẩu mới</label>
                         <div class="input-group">
-                            <input type="password" id="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới">
-                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword', this)"><i class="fa fa-eye"></i></button>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới" oninput="handlePasswordInput('confirmPassword', 'btnToggleConfirmPassword')">
+                            <button id="btnToggleConfirmPassword" class="btn btn-outline-secondary" type="button" style="display: none;" onclick="togglePassword('confirmPassword', this)"><i class="fa fa-eye"></i></button>
                         </div>
                         <div id="confirmPasswordError" class="error-message text-danger mt-1"></div>
                     </div>
@@ -573,6 +573,22 @@
                 input.type = 'password';
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
+            }
+        }
+
+        function handlePasswordInput(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (input.value.length > 0) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+                if (input.type === 'text') {
+                    input.type = 'password';
+                    const icon = btn.querySelector('i');
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
             }
         }
 

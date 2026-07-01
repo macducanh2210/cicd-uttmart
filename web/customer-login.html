@@ -171,7 +171,10 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Mật khẩu</label>
-                        <input type="password" id="cusLoginPwd" class="form-control" placeholder="Nhập mật khẩu">
+                        <div class="input-group">
+                            <input type="password" id="cusLoginPwd" class="form-control" placeholder="Nhập mật khẩu" oninput="handlePasswordInput('cusLoginPwd', 'btnToggleCusLoginPwd')">
+                            <button id="btnToggleCusLoginPwd" class="btn btn-outline-secondary" type="button" style="display: none;" onclick="togglePassword('cusLoginPwd', this)"><i class="fa fa-eye"></i></button>
+                        </div>
                         <div class="error-msg" id="cusLoginPwdErr"></div>
                     </div>
                     <button class="btn-main mb-3" onclick="doCustomerLogin()">
@@ -207,7 +210,10 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Mật khẩu</label>
-                        <input type="password" id="cusRegPwd" class="form-control" placeholder="Ít nhất 6 ký tự">
+                        <div class="input-group">
+                            <input type="password" id="cusRegPwd" class="form-control" placeholder="Ít nhất 6 ký tự" oninput="handlePasswordInput('cusRegPwd', 'btnToggleCusRegPwd')">
+                            <button id="btnToggleCusRegPwd" class="btn btn-outline-secondary" type="button" style="display: none;" onclick="togglePassword('cusRegPwd', this)"><i class="fa fa-eye"></i></button>
+                        </div>
                         <div class="error-msg" id="cusRegPwdErr"></div>
                     </div>
                     <button class="btn-main mb-3" onclick="doCustomerRegister()">
@@ -252,7 +258,10 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Mật khẩu mới</label>
-                        <input type="password" id="cusResetPwd" class="form-control" placeholder="Ít nhất 6 ký tự">
+                        <div class="input-group">
+                            <input type="password" id="cusResetPwd" class="form-control" placeholder="Ít nhất 6 ký tự" oninput="handlePasswordInput('cusResetPwd', 'btnToggleCusResetPwd')">
+                            <button id="btnToggleCusResetPwd" class="btn btn-outline-secondary" type="button" style="display: none;" onclick="togglePassword('cusResetPwd', this)"><i class="fa fa-eye"></i></button>
+                        </div>
                         <div class="error-msg" id="cusResetPwdErr"></div>
                     </div>
                     <button class="btn-main mb-3" onclick="doResetPassword()">
@@ -460,6 +469,35 @@
             else if (active.id === 'cusResetStep') doResetPassword();
             else if (active.id === 'cusOtpStep') doVerifyOtp();
         });
+        function togglePassword(inputId, btnElement) {
+            const input = document.getElementById(inputId);
+            const icon = btnElement.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function handlePasswordInput(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (input.value.length > 0) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+                if (input.type === 'text') {
+                    input.type = 'password';
+                    const icon = btn.querySelector('i');
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+        }
     </script>
 </body>
 </html>
