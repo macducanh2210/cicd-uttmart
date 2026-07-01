@@ -153,8 +153,8 @@ function calculateMonthlyPayroll(string $month, int $employeeId = 0): array
         $checkInTime = substr($checkInAt, 11, 8);
         $checkOutTime = $checkOutAt !== null ? substr($checkOutAt, 11, 8) : null;
 
-        $isLate = $checkInTime > '07:00:00';
-        $isEarly = $checkOutTime === null || $checkOutTime < '20:00:00';
+        $isLate = $checkInTime > '07:10:00';
+        $isEarly = $checkOutTime === null || $checkOutTime < '20:50:00' || $checkOutTime > '21:00:00';
         $violation = $isLate || $isEarly;
 
         if (!isset($attendanceByEmployee[$id])) {
