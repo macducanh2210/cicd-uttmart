@@ -22,10 +22,10 @@ if ($employeeId <= 0) {
 
 $now = new DateTimeImmutable('now');
 $timeNow = $now->format('H:i:s');
-if ($timeNow < '07:00:00' || $timeNow > '21:00:00') {
+if ($timeNow < '07:00:00' || $timeNow > '07:10:00') {
     jsonResponse(400, [
         'success' => false,
-        'message' => 'Chi duoc cham cong tu 07:00 den 21:00.',
+        'message' => 'Chi duoc cham cong tu 07:00 den 07:10.',
         'data' => null,
     ]);
 }

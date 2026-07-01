@@ -31,8 +31,8 @@ try {
     $now = new DateTimeImmutable('now');
     $timeNow = $now->format('H:i:s');
 
-    $canCheckIn = $timeNow >= '07:00:00' && $timeNow <= '21:00:00';
-    $canCheckOut = $timeNow >= '20:00:00' && $timeNow <= '21:00:00';
+    $canCheckIn = $timeNow >= '07:00:00' && $timeNow <= '07:10:00';
+    $canCheckOut = $timeNow >= '20:50:00' && $timeNow <= '21:00:00';
 
     jsonResponse(200, [
         'success' => true,
