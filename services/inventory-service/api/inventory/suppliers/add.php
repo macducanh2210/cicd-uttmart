@@ -23,10 +23,42 @@ $phone = trim((string) ($input['phone'] ?? ''));
 $email = trim((string) ($input['email'] ?? ''));
 $address = trim((string) ($input['address'] ?? ''));
 
-if ($supplierName === '') {
+if ($supplierName === '' || mb_strlen($supplierName) < 2 || mb_strlen($supplierName) > 100) {
     jsonResponse(400, [
         'success' => false,
-        'message' => 'supplier_name is required.',
+        'message' => 'Tên nhà cung cấp là bắt buộc và phải từ 2 đến 100 ký tự.',
+        'data' => null,
+    ]);
+}
+
+if ($contactName === '' || mb_strlen($contactName) < 2 || mb_strlen($contactName) > 100) {
+    jsonResponse(400, [
+        'success' => false,
+        'message' => 'Tên người liên hệ là bắt buộc và phải từ 2 đến 100 ký tự.',
+        'data' => null,
+    ]);
+}
+
+if ($phone === '' || !preg_match('/^0(3\d|5\d|7\d|8\d|9\d)\d{7}$/', $phone)) {
+    jsonResponse(400, [
+        'success' => false,
+        'message' => 'Số điện thoại không hợp lệ. Ví dụ: 0901234567.',
+        'data' => null,
+    ]);
+}
+
+if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    jsonResponse(400, [
+        'success' => false,
+        'message' => 'Email không hợp lệ hoặc bị bỏ trống.',
+        'data' => null,
+    ]);
+}
+
+if ($address === '' || mb_strlen($address) < 5 || mb_strlen($address) > 255) {
+    jsonResponse(400, [
+        'success' => false,
+        'message' => 'Địa chỉ là bắt buộc và phải từ 5 đến 255 ký tự.',
         'data' => null,
     ]);
 }

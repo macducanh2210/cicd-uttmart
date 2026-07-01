@@ -62,7 +62,7 @@ foreach ($allowedMap as $key => $column) {
 
     if ($key === 'category') {
         $value = strtolower(trim((string) $value));
-        if (!in_array($value, ['electric', 'water', 'internet', 'salary', 'import', 'office', 'maintenance', 'other'], true)) {
+        if (!in_array($value, ['utilities', 'electric', 'water', 'internet', 'salary', 'import', 'office', 'maintenance', 'other'], true)) {
             $value = 'other';
         }
     }
