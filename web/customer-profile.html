@@ -93,7 +93,8 @@
 
                     <div class="form-group">
                         <label>Tên đầy đủ</label>
-                        <input type="text" id="profileFullName" class="form-control">
+                        <input type="text" id="profileFullName" class="form-control" maxlength="100">
+                        <div id="profileFullNameError" class="error-message"></div>
                     </div>
 
                     <div class="form-group">
@@ -104,12 +105,14 @@
 
                     <div class="form-group">
                         <label>Số điện thoại</label>
-                        <input type="tel" id="profilePhone" class="form-control">
+                        <input type="tel" id="profilePhone" class="form-control" maxlength="10" placeholder="0xxxxxxxxx">
+                        <div id="profilePhoneError" class="error-message"></div>
                     </div>
 
                     <div class="form-group">
                         <label>Địa chỉ</label>
-                        <input type="text" id="profileAddress" class="form-control">
+                        <input type="text" id="profileAddress" class="form-control" maxlength="255">
+                        <div id="profileAddressError" class="error-message"></div>
                     </div>
 
                     <div class="row">
@@ -117,6 +120,7 @@
                             <div class="form-group">
                                 <label>Ngày sinh</label>
                                 <input type="date" id="profileDOB" class="form-control">
+                                <div id="profileDOBError" class="error-message"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -126,6 +130,7 @@
                                     <option value="0">Nam</option>
                                     <option value="1">Nữ</option>
                                 </select>
+                                <div id="profileGenderError" class="error-message"></div>
                             </div>
                         </div>
                     </div>
@@ -263,13 +268,87 @@
             }
         }
 
+        function clearProfileErrors() {
+            document.getElementById('profileFullNameError').textContent = '';
+            document.getElementById('profilePhoneError').textContent = '';
+            document.getElementById('profileAddressError').textContent = '';
+            document.getElementById('profileDOBError').textContent = '';
+            document.getElementById('profileGenderError').textContent = '';
+            document.getElementById('profileMessage').innerHTML = '';
+        }
+
+        function validateProfileForm() {
+            clearProfileErrors();
+
+            const fullName = document.getElementById('profileFullName').value.trim();
+            if (!fullName) {
+                document.getElementById('profileFullNameError').textContent = 'Họ tên không được để trống';
+                return false;
+            }
+            if (fullName.length < 2 || fullName.length > 100) {
+                document.getElementById('profileFullNameError').textContent = 'Họ tên phải từ 2 đến 100 ký tự';
+                return false;
+            }
+            if (!/^[\p{L}\p{M}\s'.-]+$/u.test(fullName)) {
+                document.getElementById('profileFullNameError').textContent = 'Họ tên chỉ được chứa chữ cái, khoảng trắng và dấu';
+                return false;
+            }
+
+            const phone = document.getElementById('profilePhone').value.trim();
+            if (!phone) {
+                document.getElementById('profilePhoneError').textContent = 'Số điện thoại không được để trống';
+                return false;
+            }
+            if (!/^0\d{9}$/.test(phone)) {
+                document.getElementById('profilePhoneError').textContent = 'Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số';
+                return false;
+            }
+
+            const address = document.getElementById('profileAddress').value.trim();
+            if (!address) {
+                document.getElementById('profileAddressError').textContent = 'Địa chỉ không được để trống';
+                return false;
+            }
+            if (address.length < 5 || address.length > 255) {
+                document.getElementById('profileAddressError').textContent = 'Địa chỉ phải từ 5 đến 255 ký tự';
+                return false;
+            }
+
+            const dob = document.getElementById('profileDOB').value;
+            if (dob) {
+                const dobDate = new Date(dob);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (Number.isNaN(dobDate.getTime())) {
+                    document.getElementById('profileDOBError').textContent = 'Ngày sinh không hợp lệ';
+                    return false;
+                }
+                if (dobDate > today) {
+                    document.getElementById('profileDOBError').textContent = 'Ngày sinh không được lớn hơn ngày hiện tại';
+                    return false;
+                }
+            }
+
+            const gender = parseInt(document.getElementById('profileGender').value, 10);
+            if (![0, 1].includes(gender)) {
+                document.getElementById('profileGenderError').textContent = 'Giới tính không hợp lệ';
+                return false;
+            }
+
+            return true;
+        }
+
         async function updateProfile() {
+            if (!validateProfileForm()) {
+                return;
+            }
+
             const data = {
-                full_name: document.getElementById('profileFullName').value,
-                phone: document.getElementById('profilePhone').value,
-                address: document.getElementById('profileAddress').value,
+                full_name: document.getElementById('profileFullName').value.trim(),
+                phone: document.getElementById('profilePhone').value.trim(),
+                address: document.getElementById('profileAddress').value.trim(),
                 dob: document.getElementById('profileDOB').value,
-                gender: parseInt(document.getElementById('profileGender').value)
+                gender: parseInt(document.getElementById('profileGender').value, 10)
             };
 
             try {
@@ -285,10 +364,13 @@
                     setTimeout(() => {
                         document.getElementById('profileMessage').innerHTML = '';
                     }, 3000);
+                } else {
+                    const errorMessage = result.errors && result.errors.length ? result.errors[0] : (result.message || 'Cập nhật thất bại');
+                    document.getElementById('profileMessage').innerHTML = `<div class="alert alert-danger">${errorMessage}</div>`;
                 }
             } catch (err) {
                 console.error(err);
-                alert('Cập nhật thất bại');
+                document.getElementById('profileMessage').innerHTML = '<div class="alert alert-danger">Cập nhật thất bại</div>';
             }
         }
 
