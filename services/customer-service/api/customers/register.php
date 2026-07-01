@@ -6,22 +6,28 @@ $input = getJsonInput();
 
 // Validate input
 if (empty($input['email']) || empty($input['password']) || empty($input['fullname']) || empty($input['phone'])) {
-    jsonResponse(400, ['success' => false, 'message' => 'Missing required fields: email, password, fullname, phone']);
+    jsonResponse(400, ['success' => false, 'message' => 'Vui lòng nhập đầy đủ họ tên, email, số điện thoại và mật khẩu']);
 }
 
-$email = trim($input['email']);
-$password = trim($input['password']);
-$fullname = trim($input['fullname']);
-$phone = trim($input['phone']);
+$email = trim((string)($input['email'] ?? ''));
+$password = trim((string)($input['password'] ?? ''));
+$fullname = trim((string)($input['fullname'] ?? ''));
+$phone = trim((string)($input['phone'] ?? ''));
 
-// Validate email format
-if (!validateEmail($email)) {
-    jsonResponse(400, ['success' => false, 'message' => 'Invalid email format']);
+if ($fullname === '' || mb_strlen($fullname) < 2 || mb_strlen($fullname) > 100) {
+    jsonResponse(400, ['success' => false, 'message' => 'Họ tên phải từ 2 đến 100 ký tự']);
 }
 
-// Validate password strength
-if (strlen($password) < 6) {
-    jsonResponse(400, ['success' => false, 'message' => 'Password must be at least 6 characters']);
+if ($email === '' || !validateEmail($email)) {
+    jsonResponse(400, ['success' => false, 'message' => 'Email không đúng định dạng']);
+}
+
+if ($phone === '' || !preg_match('/^0\d{9}$/', $phone)) {
+    jsonResponse(400, ['success' => false, 'message' => 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0']);
+}
+
+if (strlen($password) < 6 || strlen($password) > 72) {
+    jsonResponse(400, ['success' => false, 'message' => 'Mật khẩu phải từ 6 đến 72 ký tự']);
 }
 
 try {
