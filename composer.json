@@ -1,0 +1,7 @@
+{
+    "name": "uttmart/microservices",
+    "description": "UTTMart PHP Project",
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    }
+}
