@@ -224,7 +224,11 @@
             flex-direction: column;
             gap: 6px;
         }
-
+        .field-error {
+            color: var(--danger);
+            font-size: 0.85rem;
+            min-height: 1rem;
+        }
         .field label {
             font-size: 0.85rem;
             font-weight: 700;
@@ -379,25 +383,31 @@
                     <div class="form-grid">
                         <div class="field">
                             <label for="supplierName">Ten nha cung cap</label>
-                            <input id="supplierName" type="text" placeholder="Cong ty ABC" required>
+                            <input id="supplierName" type="text" placeholder="Cong ty ABC" maxlength="100" required>
+                            <div id="supplierNameError" class="field-error"></div>
                         </div>
                         <div class="field">
                             <label for="contactName">Nguoi lien he</label>
-                            <input id="contactName" type="text" placeholder="Nguyen Van A">
+                            <input id="contactName" type="text" placeholder="Nguyen Van A" maxlength="100" required>
+                            <div id="contactNameError" class="field-error"></div>
                         </div>
                         <div class="field">
                             <label for="phone">So dien thoai</label>
-                            <input id="phone" type="text" placeholder="0900000000">
+                            <input id="phone" type="text" placeholder="0901234567" maxlength="10" required>
+                            <div id="phoneError" class="field-error"></div>
                         </div>
                         <div class="field">
                             <label for="email">Email</label>
-                            <input id="email" type="email" placeholder="supplier@example.com">
+                            <input id="email" type="email" placeholder="supplier@example.com" maxlength="100" required>
+                            <div id="emailError" class="field-error"></div>
                         </div>
                     </div>
                     <div class="field mb-3">
                         <label for="address">Dia chi</label>
-                        <input id="address" type="text" placeholder="So nha, duong, quan, tinh">
+                        <input id="address" type="text" placeholder="So nha, duong, quan, tinh" maxlength="255" required>
+                        <div id="addressError" class="field-error"></div>
                     </div>
+                    <div id="supplierFormMessage" class="field-error mb-3"></div>
                     <div class="actions">
                         <button class="btn-primary-soft" type="submit" id="saveBtn">Luu nha cung cap</button>
                         <button class="btn-danger-soft" type="button" id="resetBtn">Lam moi form</button>
@@ -502,6 +512,71 @@
             document.getElementById('summaryText').textContent = `${filtered.length} / ${suppliers.length} nha cung cap`;
         }
 
+        function clearSupplierErrors() {
+            document.getElementById('supplierNameError').textContent = '';
+            document.getElementById('contactNameError').textContent = '';
+            document.getElementById('phoneError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('addressError').textContent = '';
+            document.getElementById('supplierFormMessage').textContent = '';
+        }
+
+        function validateSupplierForm() {
+            clearSupplierErrors();
+
+            const supplierName = document.getElementById('supplierName').value.trim();
+            if (!supplierName) {
+                document.getElementById('supplierNameError').textContent = 'Tên nhà cung cấp không được để trống.';
+                return false;
+            }
+            if (supplierName.length < 2 || supplierName.length > 100) {
+                document.getElementById('supplierNameError').textContent = 'Tên nhà cung cấp phải từ 2 đến 100 ký tự.';
+                return false;
+            }
+
+            const contactName = document.getElementById('contactName').value.trim();
+            if (!contactName) {
+                document.getElementById('contactNameError').textContent = 'Người liên hệ không được để trống.';
+                return false;
+            }
+            if (contactName.length < 2 || contactName.length > 100) {
+                document.getElementById('contactNameError').textContent = 'Người liên hệ phải từ 2 đến 100 ký tự.';
+                return false;
+            }
+
+            const phone = document.getElementById('phone').value.trim();
+            if (!phone) {
+                document.getElementById('phoneError').textContent = 'Số điện thoại không được để trống.';
+                return false;
+            }
+            if (!/^0(3\d|5\d|7\d|8\d|9\d)\d{7}$/.test(phone)) {
+                document.getElementById('phoneError').textContent = 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09.';
+                return false;
+            }
+
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                document.getElementById('emailError').textContent = 'Email không được để trống.';
+                return false;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('emailError').textContent = 'Email không đúng định dạng.';
+                return false;
+            }
+
+            const address = document.getElementById('address').value.trim();
+            if (!address) {
+                document.getElementById('addressError').textContent = 'Địa chỉ không được để trống.';
+                return false;
+            }
+            if (address.length < 5 || address.length > 255) {
+                document.getElementById('addressError').textContent = 'Địa chỉ phải từ 5 đến 255 ký tự.';
+                return false;
+            }
+
+            return true;
+        }
+
         function resetForm() {
             editingSupplierId = null;
             document.getElementById('supplierId').value = '';
@@ -510,6 +585,7 @@
             document.getElementById('phone').value = '';
             document.getElementById('email').value = '';
             document.getElementById('address').value = '';
+            clearSupplierErrors();
             document.getElementById('saveBtn').textContent = 'Luu nha cung cap';
         }
 
@@ -521,6 +597,11 @@
 
         async function submitSupplier(event) {
             event.preventDefault();
+            if (!validateSupplierForm()) {
+                document.getElementById('supplierFormMessage').textContent = 'Vui lòng sửa các trường bị lỗi trước khi lưu.';
+                return;
+            }
+
             const payload = {
                 supplier_name: document.getElementById('supplierName').value.trim(),
                 contact_name: document.getElementById('contactName').value.trim(),
@@ -528,11 +609,6 @@
                 email: document.getElementById('email').value.trim(),
                 address: document.getElementById('address').value.trim(),
             };
-
-            if (!payload.supplier_name) {
-                alert('Vui long nhap ten nha cung cap.');
-                return;
-            }
 
             let endpoint = `${SUPPLIER_API}/add.php`;
             if (editingSupplierId !== null) {
