@@ -398,6 +398,7 @@
                 <div class="field">
                     <label for="categoryInput">Danh muc</label>
                     <select id="categoryInput">
+                        <option value="utilities">Thanh toan dien nuoc</option>
                         <option value="electric">Dien</option>
                         <option value="water">Nuoc</option>
                         <option value="internet">Mang</option>
@@ -518,6 +519,7 @@
     function categoryLabel(category) {
         const c = String(category || 'other').toLowerCase();
         const map = {
+            utilities: 'Thanh toan dien nuoc',
             electric: 'Dien',
             water: 'Nuoc',
             internet: 'Mang',
