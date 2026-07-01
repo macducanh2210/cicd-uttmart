@@ -468,11 +468,13 @@
 
             clearErr(['cusRegNameErr','cusRegEmailErr','cusRegPhoneErr','cusRegPwdErr']);
             let ok = true;
-            if (!fullName)  { setErr('cusRegNameErr', 'Tên không được để trống'); ok = false; }
-            if (!email)     { setErr('cusRegEmailErr', 'Email không được để trống'); ok = false; }
-            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('cusRegEmailErr', 'Email không hợp lệ'); ok = false; }
-            if (!phone)     { setErr('cusRegPhoneErr', 'Số điện thoại không được để trống'); ok = false; }
-            if (!password || password.length < 6) { setErr('cusRegPwdErr', 'Mật khẩu phải có ít nhất 6 ký tự'); ok = false; }
+            if (!fullName.trim())  { setErr('cusRegNameErr', 'Tên không được để trống'); ok = false; }
+            else if (fullName.trim().length < 2 || fullName.trim().length > 100) { setErr('cusRegNameErr', 'Tên phải từ 2 đến 100 ký tự'); ok = false; }
+            if (!email.trim())     { setErr('cusRegEmailErr', 'Email không được để trống'); ok = false; }
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setErr('cusRegEmailErr', 'Email không hợp lệ'); ok = false; }
+            if (!phone.trim())     { setErr('cusRegPhoneErr', 'Số điện thoại không được để trống'); ok = false; }
+            else if (!/^0\d{9}$/.test(phone.trim())) { setErr('cusRegPhoneErr', 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 0'); ok = false; }
+            if (!password || password.length < 6 || password.length > 72) { setErr('cusRegPwdErr', 'Mật khẩu phải từ 6 đến 72 ký tự'); ok = false; }
             if (!ok) return;
 
             try {
